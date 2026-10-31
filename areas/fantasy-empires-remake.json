@@ -1,0 +1,43 @@
+{
+ "note": "Fantasy Empires remake (LostMystic): where the bot goes for each kind of update. Words are matched against the new lines of the game's web/CHANGES.txt (its version.json notes). Steps are pressed by the bot: --screen campaign opens New Game on 'New campaign'; Down picks 'Campaign 2: the hero's road', Up then Return is 'Begin your journey', Return is 'Set off'. Then the bot clicks about the map, which walks the hero.",
+ "areas": [
+  {
+   "name": "Campaign 2",
+   "match": "campaign 2, village, villager, map, road, town, tavern, chat, job, priest, temple, store, river, folk, dungeon, door, torch, lantern, trap, thief, thieves, lair, hero",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign",
+   "seconds": 150,
+   "explore": true,
+   "exploreAfter": 18,
+   "settle": 4,
+   "steps": [
+    "wait 5",
+    "key ArrowDown",
+    "wait 0.7",
+    "key Enter",
+    "wait 2.5",
+    "key ArrowUp",
+    "wait 0.5",
+    "key Enter",
+    "wait 7",
+    "key Enter",
+    "wait 1.5"
+   ]
+  },
+  {
+   "name": "Battles",
+   "match": "battle, spell, army, armies, siege, castle, fight, foe, monster, troops, empire",
+   "query": "autostart&args=--skip-intro",
+   "seconds": 120,
+   "explore": false,
+   "settle": 3
+  },
+  {
+   "name": "Title and demo battles",
+   "match": "",
+   "query": "autostart&args=--skip-intro",
+   "seconds": 120,
+   "explore": false,
+   "settle": 3
+  }
+ ]
+}
