@@ -5,9 +5,9 @@ A new video of a game each time it is updated, on its page at [evergamer.com](ht
 Every hour (`.github/workflows/showcase.yml`) the bot asks the EverGamer hub which games have automatic videos
 switched on. For each one, one at a time, it reads the game's updates file, and when the version changed it opens
 the game in Chrome, goes to the parts of the game the new notes talk about, plays for 2 to 5 minutes, records it,
-(The hourly look takes a few seconds and installs nothing; the recorder is set up only when a game was updated.)
 uploads the video to the [Internet Archive](https://archive.org), deletes its own copy and tells the hub. The game's
 page then shows the newest video at the top with what changed, and the older ones under it.
+(The hourly look takes a few seconds and installs nothing; the recorder is set up only when a game was updated.)
 
 Makers switch it on from their game's page on EverGamer (signed in): where the game is played, its updates file,
 a login if the build has one, the sound (off unless they choose otherwise), and optionally the areas to show.
