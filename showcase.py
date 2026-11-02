@@ -504,6 +504,23 @@ def main():
     if not DRY and not os.environ.get("SHOWCASE_FAKE_UPLOAD") and not (os.environ.get("IA_ACCESS") and os.environ.get("IA_SECRET")):
         log("no Internet Archive keys yet (repository secrets IA_ACCESS and IA_SECRET): nothing is recorded until they are set")
         return 0
+    if os.environ.get("SHOWCASE_CHECK"):  # the hourly look: is there anything to record? (no browser needed)
+        work = False
+        for job in jobs:
+            st = job["settings"] if isinstance(job["settings"], dict) else json.loads(job["settings"])
+            try:
+                version = read_updates(st)[0]
+            except Exception as e:
+                log(f"{job.get('game')}: could not read its updates ({type(e).__name__})")
+                continue
+            if version and version != job.get("lastVersion"):
+                log(f"{job.get('game')}: update {version[:24]}")
+                work = True
+        if os.environ.get("GITHUB_OUTPUT"):
+            with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+                f.write(f"work={'1' if work else '0'}\n")
+        log("something to record" if work else "nothing new")
+        return 0
     from playwright.sync_api import sync_playwright
     made, failed = 0, 0
     with sync_playwright() as pw:

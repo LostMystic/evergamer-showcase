@@ -1,10 +1,10 @@
 name: Showcase videos
 
-# Once a day: a new video of each EverGamer game that was updated (showcase.py). One run at a time, and one game at a
-# time inside it, so it never competes with itself for the machine.
+# Every hour: a quick look for updated games (a few seconds, nothing installed); only when one was updated, a new video
+# of it (showcase.py). One run at a time, and one game at a time inside it, so it never competes with itself.
 on:
   schedule:
-    - cron: "17 9 * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       game:
@@ -27,16 +27,27 @@ jobs:
       - uses: actions/checkout@v4
       # GitHub switches off the schedule of a repository nobody has changed for 60 days; switching it on again here
       # every run keeps it going.
-      - name: Keep the daily schedule on
+      - name: Keep the schedule on
         run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/showcase.yml/enable" || true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Look for updates
+        id: check
+        run: python showcase.py
+        env:
+          SHOWCASE_CHECK: "1"
+          SHOWCASE_TOKEN: ${{ secrets.SHOWCASE_TOKEN }}
+          IA_ACCESS: ${{ secrets.IA_ACCESS }}
+          IA_SECRET: ${{ secrets.IA_SECRET }}
+          SHOWCASE_ONLY: ${{ github.event.inputs.game }}
       # The runner's own Google Chrome plays the games; Playwright drives it and needs only its small ffmpeg.
       - name: Install Playwright
+        if: steps.check.outputs.work == '1'
         run: |
           pip install --quiet playwright==1.49.1
           python -m playwright install ffmpeg
-      - name: Look for updates and record them
+      - name: Record them
+        if: steps.check.outputs.work == '1'
         run: python showcase.py
         env:
           SHOWCASE_TOKEN: ${{ secrets.SHOWCASE_TOKEN }}
