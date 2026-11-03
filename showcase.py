@@ -554,8 +554,16 @@ def main():
                 made += run_game(pw, job)
             except Exception as e:
                 failed += 1
-                # The error's kind only: its words could hold the game's address.
-                log(f"{job.get('game')}: failed ({type(e).__name__}); it is tried again next run")
+                # The error's kind only: its words could hold the game's address. Known causes are named, so the
+                # maker can tell a missing login from a broken game without the log saying where it is played.
+                why = str(e)
+                hint = next((h for k, h in [
+                    ("ERR_INVALID_AUTH_CREDENTIALS", "the game asks for a login: save the play-test login in the panel"),
+                    ("401", "the game asks for a login: save the play-test login in the panel"),
+                    ("ERR_NAME_NOT_RESOLVED", "its play address does not exist"),
+                    ("ERR_CONNECTION", "its server did not answer"),
+                    ("Timeout", "the game took too long to load")] if k in why), "")
+                log(f"{job.get('game')}: failed ({type(e).__name__}{': ' + hint if hint else ''}); it is tried again next run")
                 if os.environ.get("SHOWCASE_DEBUG"):  # local testing only: the details can name the game's address
                     traceback.print_exc()
     if not DRY:
