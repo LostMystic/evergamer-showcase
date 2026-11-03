@@ -52,6 +52,23 @@ MAX_GAMES = int(os.environ.get("SHOWCASE_MAX", "3"))  # recordings per run, so o
 UA = "EverGamerShowcaseBot/1.0 (+https://evergamer.com)"
 
 
+def redact(text, job):
+    """Text safe for the public log: the game's addresses, hosts and login blanked out."""
+    st = job.get("settings") or {}
+    if isinstance(st, str):
+        st = json.loads(st)
+    for v in [st.get("play"), st.get("feed"), st.get("user"), st.get("pass")]:
+        if v:
+            text = text.replace(v, "<hidden>")
+    for v in [st.get("play"), st.get("feed")]:
+        host = urllib.parse.urlsplit(v or "").hostname
+        if host:
+            text = text.replace(host, "<host>")
+    text = re.sub(r"\b\d{1,3}(\.\d{1,3}){3}\b", "<ip>", text)
+    text = re.sub(r"https?://\S+", "<address>", text)
+    return " | ".join(l.strip() for l in text.strip().splitlines()[-14:])
+
+
 def log(*a):
     print(time.strftime("%H:%M:%S"), *a, flush=True)
 
@@ -281,6 +298,10 @@ def record_segment(pw, s, area, seconds, n, work):
     if sound == "nomusic" and music:
         ctx.route("**/*", lambda route: route.abort() if any(m in route.request.url.lower() for m in music) else route.continue_())
     page = ctx.new_page()
+    # Why a page goes away, for the log (never its address): the tab crashing (out of memory, often) or the game
+    # closing it.
+    page.on("crash", lambda *_: log(f"  area {n}: the game's tab crashed"))
+    page.on("close", lambda *_: log(f"  area {n}: the game's tab closed"))
     t0 = time.time()
     page.goto(area_url(s["play"], area.get("query"), script_name), wait_until="load", timeout=120000)
     try:
@@ -564,6 +585,7 @@ def main():
                     ("ERR_CONNECTION", "its server did not answer"),
                     ("Timeout", "the game took too long to load")] if k in why), "")
                 log(f"{job.get('game')}: failed ({type(e).__name__}{': ' + hint if hint else ''}); it is tried again next run")
+                log("  where: " + redact(traceback.format_exc(limit=6), job))
                 if os.environ.get("SHOWCASE_DEBUG"):  # local testing only: the details can name the game's address
                     traceback.print_exc()
     if not DRY:
