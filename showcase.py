@@ -449,7 +449,9 @@ def ia_put(ident, path, mime, meta):
                 if e.code not in (500, 502, 503, 504) or attempt == tries - 1:
                     raise
                 wait = min(60 * 2 ** attempt, 300)
-                log(f"  the Archive said {e.code} ({e.reason}); trying again in {wait // 60} min; {ia_room(ident)[1]}")
+                # Its own words (S3-style XML: Code, Message), which say more than the status line.
+                said = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", e.read(600).decode("utf-8", "replace"))).strip()[:200]
+                log(f"  the Archive said {e.code} ({e.reason}): {said or '(no message)'}; trying again in {wait // 60} min; {ia_room(ident)[1]}")
         time.sleep(wait)
 
 
