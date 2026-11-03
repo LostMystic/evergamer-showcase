@@ -449,8 +449,24 @@ def ia_put(ident, path, mime, meta):
                 if e.code not in (500, 502, 503, 504) or attempt == tries - 1:
                     raise
                 wait = min(60 * 2 ** attempt, 300)
-                log(f"  the Archive said {e.code} ({e.reason}); trying again in {wait // 60} min")
+                log(f"  the Archive said {e.code} ({e.reason}); trying again in {wait // 60} min; {ia_room(ident)[1]}")
         time.sleep(wait)
+
+
+def ia_room(ident):
+    """Whether the Archive takes an upload from this account now (its check_limit answer), and why not. Asked before
+    recording, so a busy Archive does not cost a 15-minute recording that cannot be uploaded (3 November 2026: it
+    answered 503 Slow Down for 30 minutes while its whole queue was near its limit)."""
+    q = urllib.parse.urlencode({"check_limit": 1, "accesskey": os.environ.get("IA_ACCESS", ""), "bucket": ident})
+    try:
+        d = public_json(f"https://s3.us.archive.org/?{q}")
+    except Exception as e:
+        return True, f"could not ask ({type(e).__name__})"
+    det = d.get("detail") or {}
+    why = (f"over_limit {d.get('over_limit')}, reason {det.get('limit_reason') or 'none given'}, account tasks queued "
+           f"{det.get('accesskey_tasks_queued')} of {det.get('accesskey_ration')}, whole Archive {det.get('total_tasks_queued')} of "
+           f"{det.get('total_global_limit')}")
+    return not d.get("over_limit"), why
 
 
 def ia_upload(game, title, desc, video, poster):
@@ -488,6 +504,12 @@ def run_game(pw, job):
         return False
     log(f"{game}: update {version[:24]}")
     fresh = new_notes(game, notes)
+    if not DRY and not os.environ.get("SHOWCASE_FAKE_UPLOAD"):
+        ok, why = ia_room(f"evergamer-{game}-check")
+        log(f"{game}: the Archive: {why}")
+        if not ok:
+            log(f"{game}: the Archive is not taking uploads from us now; tried again next run")
+            return False
     plan = pick(areas_of(game, s), fresh)
     log(f"{game}: showing " + ", ".join(f"{a.get('name', '?')} ({secs}s)" for a, secs in plan))
     work = OUT / game
