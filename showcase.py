@@ -335,15 +335,29 @@ def has_drawtext():
     return " drawtext " in out
 
 
-def caption_filter(work, title):
+# The small line kept along the bottom of the whole video (LostMystic, 3 November 2026: "put like a date or something
+# like that when it's recorded ... if you have to mute the sound ... a tiny little note at the bottom").
+MUTED = {"off": "Sound muted for copyright reasons", "nomusic": "Music muted for copyright reasons"}
+
+
+def footnote(sound, when=None):
+    return " \u00b7 ".join(x for x in [f"Recorded {when or time.strftime('%Y-%m-%d', time.gmtime())}", MUTED.get(sound)] if x)
+
+
+def caption_filter(work, title, note=""):
     font = next((p for p in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
                              "/usr/share/fonts/TTF/dejavu/DejaVuSans-Bold.ttf"] if Path(p).exists()), None)
     if not font or not has_drawtext():
         return None
-    tf = work / "caption.txt"
+    tf, nf = work / "caption.txt", work / "note.txt"
     tf.write_text(title)
-    return (f"drawtext=fontfile={font}:textfile={tf}:x=24:y=h-th-28:fontsize=26:fontcolor=white:"
-            f"box=1:boxcolor=black@0.55:boxborderw=12:enable='lt(t,7)'")
+    vf = (f"drawtext=fontfile={font}:textfile={tf}:x=24:y=h-th-28:fontsize=26:fontcolor=white:"
+          f"box=1:boxcolor=black@0.55:boxborderw=12:enable='lt(t,7)'")
+    if note:
+        nf.write_text(note)
+        vf += (f",drawtext=fontfile={font}:textfile={nf}:x=w-tw-10:y=h-th-8:fontsize=13:fontcolor=white@0.8:"
+               f"box=1:boxcolor=black@0.45:boxborderw=4")
+    return vf
 
 
 def content_box(clip, start, secs):
@@ -375,9 +389,16 @@ def make_video(clips, work, title, sound):
     lst = work / "parts.txt"
     lst.write_text("".join(f"file '{p.name}'\n" for p in parts))
     out = work / "showcase.mp4"
-    vf = caption_filter(work, title)
-    ff("-f", "concat", "-safe", "0", "-i", str(lst), *(["-vf", vf] if vf else []), "-c:v", "libx264", "-preset", "veryfast",
+    vf = caption_filter(work, title, footnote(sound))
+    enc = lambda vf: ff("-f", "concat", "-safe", "0", "-i", str(lst), *(["-vf", vf] if vf else []), "-c:v", "libx264", "-preset", "veryfast",
        "-crf", "28", "-pix_fmt", "yuv420p", *(["-c:a", "aac", "-b:a", "128k"] if sound != "off" else ["-an"]), "-movflags", "+faststart", "-threads", "2", str(out))
+    try:
+        enc(vf)
+    except subprocess.CalledProcessError:
+        if not vf:
+            raise
+        log("captions failed; the video goes without them (the page still shows the date and the sound note)")
+        enc(None)
     poster = work / "poster.jpg"
     dur = sum(c[2] for c in clips)
     ff("-ss", str(max(1, dur * 0.4)), "-i", str(out), "-frames:v", "1", "-q:v", "4", str(poster))
@@ -461,7 +482,8 @@ def run_game(pw, job):
     size = video.stat().st_size
     log(f"{game}: video {dur}s, {size / 1e6:.1f} MB, encoded in {enc_s:.0f}s")
     ru = resource.getrusage(resource.RUSAGE_CHILDREN)
-    stats = {"recordSeconds": round(t_enc - t_start), "encodeSeconds": round(enc_s), "mb": round(size / 1e6, 1),
+    # The page shows these under the video too: the day it was recorded, and whether the sound was left out.
+    stats = {"recorded": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "sound": s.get("sound") or "off", "recordSeconds": round(t_enc - t_start), "encodeSeconds": round(enc_s), "mb": round(size / 1e6, 1),
              "cpuSeconds": round(ru.ru_utime + ru.ru_stime), "peakMemMB": round(ru.ru_maxrss / 1024),
              "load": [round(x, 2) for x in os.getloadavg()]}
     if DRY:
