@@ -434,7 +434,11 @@ def ia_put(ident, path, mime, meta):
                "Content-Type": mime, "Content-Length": str(path.stat().st_size), "x-archive-size-hint": str(path.stat().st_size)}
     for k, v in meta.items():
         headers[k] = "uri(" + urllib.parse.quote(v, safe="") + ")" if k.startswith("x-archive-meta") else v
-    for attempt in range(4):
+    # 503 SlowDown: the Archive is rationing uploads (its whole queue, not ours: 3 November 2026 it was at 10,351 of
+    # 11,999 tasks and four tries in 6 minutes all failed). Wait longer each time, up to about 27 minutes, which still
+    # fits the job's 50 after recording and encoding; then the next run tries again.
+    tries = 8
+    for attempt in range(tries):
         with open(path, "rb") as f:
             req = urllib.request.Request(f"https://s3.us.archive.org/{ident}/{path.name}", data=f, method="PUT", headers=headers)
             try:
@@ -442,10 +446,11 @@ def ia_put(ident, path, mime, meta):
                     r.read()
                 return
             except urllib.error.HTTPError as e:
-                # 503 SlowDown: the Archive asks uploaders to wait and try again.
-                if e.code not in (500, 502, 503, 504) or attempt == 3:
+                if e.code not in (500, 502, 503, 504) or attempt == tries - 1:
                     raise
-        time.sleep(60 * (attempt + 1))
+                wait = min(60 * 2 ** attempt, 300)
+                log(f"  the Archive said {e.code} ({e.reason}); trying again in {wait // 60} min")
+        time.sleep(wait)
 
 
 def ia_upload(game, title, desc, video, poster):
