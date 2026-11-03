@@ -285,7 +285,10 @@ def record_segment(pw, s, area, seconds, n, work):
         args += [f"--window-size={W},{H}", "--window-position=0,0", "--kiosk", "--no-first-run"]
     else:
         args.append("--mute-audio")
-    browser = pw.chromium.launch(channel="chrome", headless=not with_sound, args=args)
+    # The virtual screen goes to the browser itself: Playwright's driver started before x11_ready set DISPLAY, and
+    # the browser takes the driver's environment, so without this it found no screen and quit (3 November 2026).
+    browser = pw.chromium.launch(channel="chrome", headless=not with_sound, args=args,
+                                 **({"env": {**os.environ, "DISPLAY": ":99"}} if with_sound else {}))
     opts = dict(viewport={"width": W, "height": H}, ignore_https_errors=True,
                 http_credentials={"username": s["user"], "password": s.get("pass", "")} if s.get("user") else None)
     if not with_sound:
