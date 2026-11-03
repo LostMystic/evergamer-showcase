@@ -301,10 +301,8 @@ def record_segment(pw, s, area, seconds, n, work):
     if sound == "nomusic" and music:
         ctx.route("**/*", lambda route: route.abort() if any(m in route.request.url.lower() for m in music) else route.continue_())
     page = ctx.new_page()
-    # Why a page goes away, for the log (never its address): the tab crashing (out of memory, often) or the game
-    # closing it.
+    # Why a page goes away, for the log (never its address): the tab crashing (out of memory, often).
     page.on("crash", lambda *_: log(f"  area {n}: the game's tab crashed"))
-    page.on("close", lambda *_: log(f"  area {n}: the game's tab closed"))
     t0 = time.time()
     page.goto(area_url(s["play"], area.get("query"), script_name), wait_until="load", timeout=120000)
     try:
