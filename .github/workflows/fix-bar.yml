@@ -1,0 +1,36 @@
+name: Cut the browser bar off posted videos
+
+# By hand only (fix_bar.py): the videos with sound posted before 6 November 2026 showed Chrome's tabs and address bar.
+on:
+  workflow_dispatch:
+    inputs:
+      items:
+        description: "The Archive items, comma between"
+        required: true
+      top:
+        description: "Rows to cut off the top"
+        required: false
+        default: "88"
+
+concurrency:
+  group: showcase
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: command -v ffmpeg || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null; }
+      - name: Cut and replace
+        run: python fix_bar.py
+        env:
+          FIX_ITEMS: ${{ github.event.inputs.items }}
+          FIX_TOP: ${{ github.event.inputs.top }}
+          IA_ACCESS: ${{ secrets.IA_ACCESS }}
+          IA_SECRET: ${{ secrets.IA_SECRET }}

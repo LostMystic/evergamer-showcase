@@ -48,6 +48,12 @@ holds the defaults for games that have none set there.
 
 Nothing the bot prints names a game's address or login: the logs of a public repository are public.
 
+**Never the browser's bars.** A video shows the game's page only: never Chrome's tabs, address bar or toolbar, which
+name where the game is played (for a maker's private server, its address). The picture is always the browser's own
+recording of the page, never a grab of the screen; with sound, only the sound is taken from the virtual sound card
+(LostMystic, 6 November 2026: "You can't do that ... make a rule that you cannot show the top few bars"). The videos
+posted before then were cut in place with `fix_bar.py` (workflow "Cut the browser bar off posted videos").
+
 ## Testing
 
 `SHOWCASE_DRY=1 SHOWCASE_JOBS=jobs.json python showcase.py` records without uploading or reporting and keeps the

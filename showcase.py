@@ -273,8 +273,11 @@ def x11_ready():
 
 def record_segment(pw, s, area, seconds, n, work):
     """One area: open it, let it load, play for its seconds. Answers the clip and where play began in it.
-    Without sound: headless, the browser's own recording (which starts with the page, so the loading is cut later).
-    With sound: on the virtual screen, ffmpeg takes the picture and the sound from the moment play begins."""
+    The picture is always the browser's own recording of the page (which starts with the page, so the loading is cut
+    later): never a grab of the screen, which showed Chrome's tabs and address bar, and with them the address of a
+    maker's private server (LostMystic, 6 November 2026: "make a rule that you cannot show the top few bars"; --kiosk
+    did not hide them on the virtual screen). With sound, the browser runs on the virtual screen and ffmpeg records
+    only the sound, from the moment play begins. Answers the clip, where play began in it, the crop and the sound."""
     sound = s.get("sound") or "off"
     with_sound = sound != "off"
     # Software WebGL: the runner has no graphics card.
@@ -282,7 +285,7 @@ def record_segment(pw, s, area, seconds, n, work):
             "--enable-unsafe-swiftshader"]
     if with_sound:
         x11_ready()
-        args += [f"--window-size={W},{H}", "--window-position=0,0", "--kiosk", "--no-first-run"]
+        args += [f"--window-size={W},{H}", "--window-position=0,0", "--no-first-run"]
     else:
         args.append("--mute-audio")
     # The virtual screen goes to the browser itself: Playwright's driver started before x11_ready set DISPLAY, and
@@ -291,8 +294,7 @@ def record_segment(pw, s, area, seconds, n, work):
                                  **({"env": {**os.environ, "DISPLAY": ":99"}} if with_sound else {}))
     opts = dict(viewport={"width": W, "height": H}, ignore_https_errors=True,
                 http_credentials={"username": s["user"], "password": s.get("pass", "")} if s.get("user") else None)
-    if not with_sound:
-        opts.update(record_video_dir=str(work), record_video_size={"width": W, "height": H})
+    opts.update(record_video_dir=str(work), record_video_size={"width": W, "height": H})
     ctx = browser.new_context(**opts)
     script_name = f"__showcase/{n}.txt"
     if area.get("script"):
@@ -301,9 +303,9 @@ def record_segment(pw, s, area, seconds, n, work):
     if sound == "nomusic" and music:
         ctx.route("**/*", lambda route: route.abort() if any(m in route.request.url.lower() for m in music) else route.continue_())
     page = ctx.new_page()
+    t0 = time.time()  # the page's recording starts with it
     # Why a page goes away, for the log (never its address): the tab crashing (out of memory, often).
     page.on("crash", lambda *_: log(f"  area {n}: the game's tab crashed"))
-    t0 = time.time()
     page.goto(area_url(s["play"], area.get("query"), script_name), wait_until="load", timeout=120000)
     try:
         page.wait_for_load_state("networkidle", timeout=90000)
@@ -318,15 +320,13 @@ def record_segment(pw, s, area, seconds, n, work):
     crop = None
     if box and box["w"] >= 200 and box["h"] >= 150 and box["w"] * box["h"] < 0.9 * W * H:
         crop = tuple(int(round(v)) // 2 * 2 for v in (box["w"], box["h"], box["x"], box["y"]))
-    start = time.time() - t0
-    grab = None
+    grab = audio = None
     if with_sound:
-        clip = work / f"clip{n}.mp4"
+        audio = work / f"sound{n}.m4a"
         grab = subprocess.Popen(["nice", "-n", "10", "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
-                                 "-f", "x11grab", "-video_size", f"{W}x{H}", "-framerate", "30", "-i", ":99",
-                                 "-f", "pulse", "-i", "rec.monitor", "-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
-                                 "-c:a", "aac", "-b:a", "128k", "-threads", "2", str(clip)], stdin=subprocess.PIPE)
-        start = 0.0
+                                 "-f", "pulse", "-i", "rec.monitor", "-c:a", "aac", "-b:a", "128k", str(audio)],
+                                stdin=subprocess.PIPE)
+    start = time.time() - t0
     t_play = time.time()
     run_steps(page, area.get("steps"))
     left = max(0.0, seconds - (time.time() - t_play))
@@ -341,11 +341,10 @@ def record_segment(pw, s, area, seconds, n, work):
         page.wait_for_timeout(int(left * 1000))
     if grab:
         grab.communicate(b"q", timeout=60)
-    else:
-        clip = Path(page.video.path())
+    clip = Path(page.video.path())
     ctx.close()
     browser.close()
-    return clip, start, crop
+    return clip, start, crop, audio
 
 
 def ff(*args):
@@ -399,13 +398,15 @@ def content_box(clip, start, secs):
 def make_video(clips, work, title, sound):
     """Cut each clip's loading off, join them, and encode H.264 for the web (two threads, low priority)."""
     parts = []
-    for i, (clip, start, secs, crop) in enumerate(clips):
+    for i, (clip, start, secs, crop, sound_file) in enumerate(clips):
         p = work / f"part{i}.mp4"
         crop = crop or content_box(clip, start, secs)
         audio = ["-c:a", "aac", "-b:a", "128k"] if sound != "off" else ["-an"]
         vf = (f"crop={crop[0]}:{crop[1]}:{crop[2]}:{crop[3]},scale={W}:{H}:force_original_aspect_ratio=decrease:flags=neighbor,"
               f"pad={W}:{H}:(ow-iw)/2:(oh-ih)/2" if crop else "null")
-        ff("-ss", f"{start:.2f}", "-i", str(clip), "-t", str(secs), "-vf", vf, *audio, "-r", "30", "-c:v", "libx264",
+        # The sound was recorded on its own from the moment play began: it joins the picture there.
+        inputs = ["-ss", f"{start:.2f}", "-i", str(clip)] + (["-i", str(sound_file), "-map", "0:v", "-map", "1:a"] if sound_file else [])
+        ff(*inputs, "-t", str(secs), "-vf", vf, *(audio if sound_file else ["-an"]), "-r", "30", "-c:v", "libx264",
            "-preset", "veryfast", "-crf", "18", "-pix_fmt", "yuv420p", "-threads", "2", str(p))
         parts.append(p)
     lst = work / "parts.txt"
@@ -519,8 +520,8 @@ def run_game(pw, job):
     work.mkdir(parents=True)
     clips = []
     for n, (area, secs) in enumerate(plan):
-        clip, start, crop = record_segment(pw, s, area, secs, n, work)
-        clips.append((clip, start, secs, crop))
+        clip, start, crop, sound_file = record_segment(pw, s, area, secs, n, work)
+        clips.append((clip, start, secs, crop, sound_file))
     name = game_title(game)
     when = (built or time.strftime("%Y-%m-%d"))[:10]
     shown = ", ".join(a.get("name", "") for a, _ in plan if a.get("name"))
