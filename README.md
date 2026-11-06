@@ -38,6 +38,8 @@ holds the defaults for games that have none set there.
 | `seconds` | How long it plays (20 to 300). All areas together make 2 to 5 minutes. |
 | `explore` | Then press keys and click about, from `exploreAfter` seconds on. |
 | `settle` | Seconds to wait after the page has loaded. |
+| `cutSteps` | The video begins once the steps are done (menus and boxes clicked through are left out). |
+| `levels` | `[lowest, highest]`: `{level}` in `query` becomes a level picked from them for each video. |
 
 ## Secrets
 

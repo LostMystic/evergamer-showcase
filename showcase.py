@@ -196,8 +196,16 @@ def pick(areas, notes):
 
 # ---- recording -------------------------------------------------------------------------------------------------
 
-def area_url(play, query, script_name):
-    q = (query or "").replace("{script}", script_name)
+def area_level(area):
+    """{level} in an area's query: a level picked afresh each video from the area's "levels" [lowest, highest], so the
+    videos show heroes of different levels (LostMystic, 6 November 2026, Fantasy Empires: "Don't have it go more than
+    12th level")."""
+    lo, hi = (list(area.get("levels") or [1, 12]) + [12])[:2]
+    return random.randint(int(lo), max(int(lo), int(hi)))
+
+
+def area_url(play, query, script_name, level=1):
+    q = (query or "").replace("{script}", script_name).replace("{level}", str(level))
     if not q:
         return play
     q = q.lstrip("?&")
@@ -306,7 +314,10 @@ def record_segment(pw, s, area, seconds, n, work):
     t0 = time.time()  # the page's recording starts with it
     # Why a page goes away, for the log (never its address): the tab crashing (out of memory, often).
     page.on("crash", lambda *_: log(f"  area {n}: the game's tab crashed"))
-    page.goto(area_url(s["play"], area.get("query"), script_name), wait_until="load", timeout=120000)
+    level = area_level(area)
+    if "{level}" in (area.get("query") or ""):
+        log(f"  area {n}: level {level}")
+    page.goto(area_url(s["play"], area.get("query"), script_name, level), wait_until="load", timeout=120000)
     try:
         page.wait_for_load_state("networkidle", timeout=90000)
     except Exception:
@@ -320,6 +331,11 @@ def record_segment(pw, s, area, seconds, n, work):
     crop = None
     if box and box["w"] >= 200 and box["h"] >= 150 and box["w"] * box["h"] < 0.9 * W * H:
         crop = tuple(int(round(v)) // 2 * 2 for v in (box["w"], box["h"], box["x"], box["y"]))
+    # "cutSteps": the video begins once the steps are done (Fantasy Empires: its steps click through the road's and the
+    # place's boxes, which would fill the first 15 seconds).
+    cut = bool(area.get("cutSteps"))
+    if cut:
+        run_steps(page, area.get("steps"))
     grab = audio = None
     if with_sound:
         audio = work / f"sound{n}.m4a"
@@ -328,7 +344,8 @@ def record_segment(pw, s, area, seconds, n, work):
                                 stdin=subprocess.PIPE)
     start = time.time() - t0
     t_play = time.time()
-    run_steps(page, area.get("steps"))
+    if not cut:
+        run_steps(page, area.get("steps"))
     left = max(0.0, seconds - (time.time() - t_play))
     if area.get("explore"):
         # The script or steps play first (for exploreAfter seconds from the start, else about half the time when there

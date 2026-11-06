@@ -1,67 +1,135 @@
 {
- "note": "Fantasy Empires remake (LostMystic): where the bot goes for each kind of update. Words are matched against the new lines of the game's web/CHANGES.txt (its version.json notes). Steps are pressed by the bot: --screen campaign opens New Game on 'New campaign'; Down picks 'Campaign 2: the hero's road', Up then Return is 'Begin your journey', Return is 'Set off'. Then the bot clicks about the map, which walks the hero.",
+ "note": "Fantasy Empires remake (LostMystic): Campaign 2 only (LostMystic, 6 November 2026: \"I don't want to see anything on the actual original campaign\"). FE_SHOWCASE=1 (the game's ?env=) skips the menus to a new hero; {level} is picked from each area's levels (never above 12); FE_TEST_STORY_JOB with FE_TEST_STORY_PLACE puts the hero at a job of that place, FE_TEST_DUNGEON picks the dungeon inside. Steps: Enter sets off, Enter at the place, Enter is Fight. Words are matched against the new lines of the game's web/CHANGES.txt (its version.json notes); the area with no words is the default.",
  "areas": [
   {
-   "name": "Campaign 2",
-   "match": "campaign 2, village, villager, map, road, town, tavern, chat, job, priest, temple, store, river, folk, dungeon, door, torch, lantern, trap, thief, thieves, lair, hero",
-   "query": "autostart&args=--skip-intro%20--screen%20campaign",
-   "seconds": 150,
+   "name": "Towers",
+   "match": "tower, stair, ladder, hatch, battlement, observatory, forebuilding, floor, cellar, closet",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level};FE_TEST_STORY_JOB=kill;FE_TEST_STORY_PLACE=tower",
+   "levels": [
+    3,
+    12
+   ],
+   "seconds": 110,
    "explore": true,
-   "exploreAfter": 18,
+   "exploreAfter": 4,
    "settle": 4,
    "steps": [
-    "wait 5",
-    "key ArrowDown",
-    "wait 0.7",
+    "wait 8",
     "key Enter",
-    "wait 2.5",
+    "wait 2",
     "key Enter",
     "wait 3",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowDown",
-    "wait 0.25",
-    "key ArrowRight",
-    "wait 0.4",
-    "key ArrowUp",
-    "wait 0.4",
     "key Enter",
-    "wait 6"
-   ]
+    "wait 5"
+   ],
+   "cutSteps": true
   },
   {
-   "name": "Battles",
-   "match": "battle, spell, army, armies, siege, castle, fight, foe, monster, troops, empire",
-   "query": "autostart&args=--skip-intro",
-   "seconds": 120,
-   "explore": false,
-   "settle": 3
+   "name": "Tar pits",
+   "match": "tar, pit, cavern, lake, seep",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level};FE_TEST_STORY_JOB=kill;FE_TEST_STORY_PLACE=cave;FE_TEST_DUNGEON=Tar%20Pits%20(small)",
+   "levels": [
+    5,
+    12
+   ],
+   "seconds": 110,
+   "explore": true,
+   "exploreAfter": 4,
+   "settle": 4,
+   "steps": [
+    "wait 8",
+    "key Enter",
+    "wait 2",
+    "key Enter",
+    "wait 3",
+    "key Enter",
+    "wait 5"
+   ],
+   "cutSteps": true
   },
   {
-   "name": "Title and demo battles",
+   "name": "Giants' caves",
+   "match": "giant, ogre",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level};FE_TEST_STORY_JOB=kill;FE_TEST_STORY_PLACE=cave;FE_TEST_DUNGEON=Giants%27%20Caves%20(small)",
+   "levels": [
+    7,
+    12
+   ],
+   "seconds": 100,
+   "explore": true,
+   "exploreAfter": 4,
+   "settle": 4,
+   "steps": [
+    "wait 8",
+    "key Enter",
+    "wait 2",
+    "key Enter",
+    "wait 3",
+    "key Enter",
+    "wait 5"
+   ],
+   "cutSteps": true
+  },
+  {
+   "name": "Dungeons",
+   "match": "dungeon, altar, monster, stairs, door, trap, prisoner, morale, lighting, shadow, chest, treasure, hoard, foe, spell, scroll, gnoll, goblin, hobgoblin, bugbear, dragon, hag, pixie, leprechaun, manticore",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level};FE_TEST_STORY_JOB=kill;FE_TEST_STORY_PLACE=ruin;FE_TEST_DUNGEON=Dungeon%20(small)",
+   "levels": [
+    1,
+    12
+   ],
+   "seconds": 110,
+   "explore": true,
+   "exploreAfter": 4,
+   "settle": 4,
+   "steps": [
+    "wait 8",
+    "key Enter",
+    "wait 2",
+    "key Enter",
+    "wait 3",
+    "key Enter",
+    "wait 5"
+   ],
+   "cutSteps": true
+  },
+  {
+   "name": "The village",
+   "match": "village, villager, tavern, inn, store, shop, temple, priest, folk, sell, buy, hire, hireling, emporium",
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level};FE_TEST_STORY_VILLAGE=tavern",
+   "levels": [
+    1,
+    12
+   ],
+   "seconds": 80,
+   "explore": true,
+   "exploreAfter": 4,
+   "settle": 4,
+   "steps": [
+    "wait 8",
+    "key Enter",
+    "wait 3"
+   ],
+   "cutSteps": true
+  },
+  {
+   "name": "The hero's road",
    "match": "",
-   "query": "autostart&args=--skip-intro",
-   "seconds": 120,
-   "explore": false,
-   "settle": 3
+   "query": "autostart&args=--skip-intro%20--screen%20campaign&env=FE_SHOWCASE=1;FE_TEST_HERO_LEVEL={level}",
+   "levels": [
+    1,
+    12
+   ],
+   "seconds": 150,
+   "explore": true,
+   "exploreAfter": 4,
+   "settle": 4,
+   "steps": [
+    "wait 8",
+    "key Enter",
+    "wait 2"
+   ],
+   "cutSteps": true
   }
  ]
 }
