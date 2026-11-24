@@ -116,7 +116,7 @@ def notes_of(game, jobs):
         d = day_of(e.get("date"))
         if d and (e.get("text") or e.get("title")):
             notes.append((d, e.get("title") or e.get("text")))
-    sources = [game["id"]] + [j["game"] for j in jobs if j["game"] != game["id"] and j["settings"].get("play") == game["play"]]
+    sources = [game["id"]] + [j["game"] for j in jobs if j["game"] != game["id"] and same_place(j["settings"].get("play"), game["play"])]
     video = None
     for gid in sources:
         try:
@@ -151,13 +151,22 @@ def notes_of(game, jobs):
     return uniq, video
 
 
+def same_place(a, b):
+    """Two play addresses for one build: the same host and folder, whatever the query or index.html."""
+    def norm(u):
+        p = urllib.parse.urlsplit(u or "")
+        path = re.sub(r"(index\.html?)?$", "", p.path or "/")
+        return (p.hostname or "", path.rstrip("/"))
+    return bool(a and b) and norm(a) == norm(b)
+
+
 def settings_for(game, jobs):
     """The game's automatic-video settings (login, areas), or a listing's played at the same address."""
     for j in jobs:
         if j["game"] == game["id"]:
             return j["settings"]
     for j in jobs:
-        if j["settings"].get("play") == game["play"]:
+        if same_place(j["settings"].get("play"), game["play"]):
             return {**j["settings"], "play": game["play"], "_from": j["game"]}
     return {"play": game["play"]}
 
@@ -203,6 +212,24 @@ def pick_area(game, s, notes):
     return random.choice(matched or areas)
 
 
+GENTLE_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowRight", "ArrowUp", "Space", "KeyW", "KeyD"]
+
+
+def gentle(page, seconds):
+    """A game the maker set no areas for: hold movement keys, never click about (a random click found a menu's Exit
+    and closed Heart of Adventure, 24 November 2026)."""
+    end = time.time() + seconds
+    while time.time() < end:
+        k = random.choice(GENTLE_KEYS)
+        try:
+            page.keyboard.down(k)
+            page.wait_for_timeout(random.randint(300, 1400))
+            page.keyboard.up(k)
+            page.wait_for_timeout(random.randint(200, 700))
+        except Exception:
+            page.wait_for_timeout(500)
+
+
 def capture(pw, game, s, area, work):
     """Screenshots of the page only (never the browser's bars): of the game's canvas when it is drawn smaller than
     the page. Answers the files taken, in order."""
@@ -221,6 +248,11 @@ def capture(pw, game, s, area, work):
     except Exception:
         pass
     page.wait_for_timeout(int(area.get("settle", 3)) * 1000)
+    own = bool(area.get("steps") or area.get("query"))
+    if not own:
+        # A page that waits for a click to start ("Click to play"): one click in the middle of the game's picture.
+        page.mouse.click(W // 2, H // 2)
+        page.wait_for_timeout(6000)
     sc.run_steps(page, area.get("steps"))
     box = page.evaluate("""() => { let b = null; for (const e of document.querySelectorAll('canvas, video')) {
         const r = e.getBoundingClientRect(); if (r.width * r.height > (b ? b.width * b.height : 0)) b = r }
@@ -231,8 +263,10 @@ def capture(pw, game, s, area, work):
         f = work / f"raw{i}.png"
         page.screenshot(path=str(f), clip=clip) if clip else page.screenshot(path=str(f))
         files.append(f)
-        if area.get("explore", True):
+        if own and area.get("explore"):
             sc.explore(page, random.uniform(4, 8))
+        elif not own:
+            gentle(page, random.uniform(4, 8))
         else:
             page.wait_for_timeout(random.randint(4000, 8000))
     ctx.close()
@@ -334,6 +368,8 @@ def main():
     game, notes, video, why = picked
     log(f"today: {game['id']} ({why}; {len(notes)} note(s))")
     s = settings_for(game, jobs)
+    log(f"  {len(jobs)} game(s) with automatic-video settings; " + (f"using those of {s['_from']}" if s.get("_from") else
+        "its own" if any(j["game"] == game["id"] for j in jobs) else "none for this game"))
     area = pick_area(game, s, notes)
     log(f"  showing: {area.get('name', 'the game')}")
     shutil.rmtree(OUT, ignore_errors=True)
