@@ -116,7 +116,7 @@ def notes_of(game, jobs):
         d = day_of(e.get("date"))
         if d and (e.get("text") or e.get("title")):
             notes.append((d, e.get("title") or e.get("text")))
-    sources = [game["id"]] + [j["game"] for j in jobs if j["game"] != game["id"] and same_place(j["settings"].get("play"), game["play"])]
+    sources = [game["id"]] + [j["game"] for j in jobs if j["game"] != game["id"] and same_build(game, j)]
     video = None
     for gid in sources:
         try:
@@ -160,14 +160,40 @@ def same_place(a, b):
     return bool(a and b) and norm(a) == norm(b)
 
 
+_versions = {}
+
+
+def build_version(play, s):
+    """The version in the updates file beside a build (or its feed), or "" (most games have none)."""
+    url = s.get("feed") or urllib.parse.urljoin(play, "version.json")
+    if url not in _versions:
+        try:
+            _versions[url] = str(json.loads(sc.fetch(url, {**s, "play": play})).get("version") or "")
+        except Exception:
+            _versions[url] = ""
+    return _versions[url]
+
+
+def same_build(game, job):
+    """A listing and a game with automatic videos are one build when they are played at the same place, or when
+    their updates files name the same version: Heart of Adventure is played at a public address and the Fantasy
+    Empires remake's videos at a private copy of the same build, behind a login (24 November 2026)."""
+    st = job["settings"]
+    if same_place(st.get("play"), game["play"]):
+        return True
+    mine = build_version(game["play"], {"play": game["play"]})
+    return bool(mine) and mine == build_version(st.get("play") or "", st)
+
+
 def settings_for(game, jobs):
-    """The game's automatic-video settings (login, areas), or a listing's played at the same address."""
+    """The game's automatic-video settings (login, areas), or those of the same build under another listing: then
+    the pictures are taken where its videos are, with the settings known to work there."""
     for j in jobs:
         if j["game"] == game["id"]:
             return j["settings"]
     for j in jobs:
-        if same_place(j["settings"].get("play"), game["play"]):
-            return {**j["settings"], "play": game["play"], "_from": j["game"]}
+        if same_build(game, j):
+            return {**j["settings"], "_from": j["game"]}
     return {"play": game["play"]}
 
 
