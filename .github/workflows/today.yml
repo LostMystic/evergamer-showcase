@@ -1,0 +1,59 @@
+name: New today
+
+# Once a day: a game on EverGamer's front page with fresh screenshots and what changed (today.py). The second time is
+# a retry: a day already featured is left alone, so it costs a few seconds.
+on:
+  schedule:
+    - cron: "40 5 * * *"
+    - cron: "40 11 * * *"
+  workflow_dispatch:
+    inputs:
+      game:
+        description: "Feature this game (its id on EverGamer), or empty to let the bot pick"
+        required: false
+      force:
+        description: "Run even if today is already featured"
+        type: boolean
+        default: false
+      dry:
+        description: "Only take the pictures (kept as this run's artifact), report nothing"
+        type: boolean
+        default: false
+
+concurrency:
+  group: today
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write # only to keep this schedule switched on (below)
+
+jobs:
+  today:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep the schedule on
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/today.yml/enable" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Install Playwright and Pillow
+        run: |
+          pip install --quiet playwright==1.49.1 pillow
+      - name: Feature today's game
+        run: python today.py
+        env:
+          SHOWCASE_TOKEN: ${{ secrets.SHOWCASE_TOKEN }}
+          IA_ACCESS: ${{ secrets.IA_ACCESS }}
+          IA_SECRET: ${{ secrets.IA_SECRET }}
+          TODAY_GAME: ${{ github.event.inputs.game }}
+          TODAY_FORCE: ${{ github.event.inputs.force == 'true' && '1' || '' }}
+          TODAY_DRY: ${{ github.event.inputs.dry == 'true' && '1' || '' }}
+      - name: Keep the pictures of a dry run
+        if: github.event.inputs.dry == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: today-pictures
+          path: out/today/shot*.jpg
+          retention-days: 3

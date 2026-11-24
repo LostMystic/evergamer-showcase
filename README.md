@@ -41,6 +41,20 @@ holds the defaults for games that have none set there.
 | `cutSteps` | The video begins once the steps are done (menus and boxes clicked through are left out). |
 | `levels` | `[lowest, highest]`: `{level}` in `query` becomes a level picked from them for each video. |
 
+## New today (today.py)
+
+Once a day (`.github/workflows/today.yml`, 05:40 UTC, again at 11:40 in case the first failed) a game goes on the front
+page of EverGamer with fresh screenshots and what changed. The bot picks the game with the newest patch notes it was not
+yet featured for (its devlog, the notes the hub read from its updates file, or a `version.json` beside the game), else
+the one featured longest ago, never the same game two days running. It opens the game headless (the page only, never
+the browser's bars), in the places the notes talk about when the game has areas, takes ten pictures while playing and
+keeps the four most different ones that are not blank, puts them on the Internet Archive and tells the hub
+(`POST /hub/today/done`). A game played at the same address as one with automatic videos borrows its settings and
+notes (Heart of Adventure and the Fantasy Empires remake are one build).
+
+By hand: run the workflow with a game's id to feature it, "force" to replace today's, or "dry" to only take the
+pictures (kept as the run's artifact for three days). Locally: `TODAY_DRY=1 python today.py`.
+
 ## Secrets
 
 | Secret | What |
