@@ -309,6 +309,9 @@ def choose_shots(files, work):
         st = ImageStat.Stat(im.convert("L"))
         if st.stddev[0] < 12:  # one color, nearly: a blank or loading screen
             continue
+        gray = im.convert("L").resize((160, 90))
+        if sum(1 for v in gray.getdata() if v < 24) > 0.6 * 160 * 90:  # mostly black: a dark corner, a fade
+            continue
         good.append((f, im, im.resize((64, 36))))
     chosen = []
     while good and len(chosen) < SHOTS:
