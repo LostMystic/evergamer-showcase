@@ -370,6 +370,11 @@ def main():
     s = settings_for(game, jobs)
     log(f"  {len(jobs)} game(s) with automatic-video settings; " + (f"using those of {s['_from']}" if s.get("_from") else
         "its own" if any(j["game"] == game["id"] for j in jobs) else "none for this game"))
+    if not s.get("_from") and os.environ.get("TODAY_DEBUG"):
+        gp = urllib.parse.urlsplit(game["play"])
+        for j in jobs:  # paths only, never a host (the log is public)
+            jp = urllib.parse.urlsplit(j["settings"].get("play") or "")
+            log(f"    {j['game']}: same host {jp.hostname == gp.hostname}, path {jp.path!r} (this game {gp.path!r}), query {bool(jp.query)}, areas {len(j['settings'].get('areas') or [])}")
     area = pick_area(game, s, notes)
     log(f"  showing: {area.get('name', 'the game')}")
     shutil.rmtree(OUT, ignore_errors=True)

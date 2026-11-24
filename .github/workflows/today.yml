@@ -50,6 +50,7 @@ jobs:
           TODAY_GAME: ${{ github.event.inputs.game }}
           TODAY_FORCE: ${{ github.event.inputs.force == 'true' && '1' || '' }}
           TODAY_DRY: ${{ github.event.inputs.dry == 'true' && '1' || '' }}
+          TODAY_DEBUG: ${{ github.event.inputs.dry == 'true' && '1' || '' }}
       - name: Keep the pictures of a dry run
         if: github.event.inputs.dry == 'true'
         uses: actions/upload-artifact@v4
