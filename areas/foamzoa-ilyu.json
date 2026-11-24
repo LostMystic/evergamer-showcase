@@ -1,0 +1,7 @@
+{
+  "note": "Foamzoa (LostMystic's Foamzilla project): the title menu needs PLAY (the first button, right of the logo's wave), then the game starts in a corridor with a soldier talking. Clicks are on the 1280x720 page. Used by today.py's pictures and by showcase.py if its automatic videos are switched on without areas of their own.",
+  "areas": [
+    {"name": "The game", "match": "", "query": "", "settle": 3, "seconds": 90, "explore": true,
+     "steps": ["wait 2", "click 924 396", "wait 10", "click 640 360"]}
+  ]
+}
