@@ -1,0 +1,119 @@
+{
+ "date": "2026-11-27",
+ "total": 5937,
+ "new": 20,
+ "newAll": 62,
+ "newAI": 14,
+ "newEverGamer": 0,
+ "top": [
+  {
+   "n": "minecraft-20kb",
+   "u": "https://github.com/eklavya-raj/minecraft-20kb",
+   "d": "Minecraft as a UEFI app in 20,760 bytes of x86-64 assembly",
+   "s": 12,
+   "t": "remake",
+   "c": "2026-11-26"
+  },
+  {
+   "n": "silmarils-maya",
+   "u": "https://github.com/Buyukcaglar/silmarils-maya",
+   "d": "Le Fétiche Maya 64bit: a native port of Silmarils' 1989 Amiga adventure by static recompilation (Windows x64; macOS in progress). Game files not included.",
+   "s": 1,
+   "t": "recompilation",
+   "c": "2026-11-26"
+  },
+  {
+   "n": "whimsy-kitchen",
+   "u": "https://github.com/ionellacupcic/whimsy-kitchen",
+   "d": "a cookbook game made with AI-assisted coding for me and my housemates",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "makefun-make-the-best-cooking-game",
+   "u": "https://github.com/wicakhendrik/makefun-make-the-best-cooking-game",
+   "d": "A night-market cooking game for the desktop browser: chop, boil, sear, plate and serve across 3 stalls and 10 dishes, with VIP tickets and a lantern rush. Plain",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "bubble-sheet-king",
+   "u": "https://github.com/ShipItFrog/bubble-sheet-king",
+   "d": "A tiny browser game: the proctor reads the answers, you fill in the bubble sheet. GitHub Game Off 2026 entry (theme: SHIFT).",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "zombie-plant-gui",
+   "u": "https://github.com/bayusetiaji/zombie-plant-gui",
+   "d": "Pixel-art GUI version of Plants vs Zombies in Rust with macroquad",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "dailies-comparer",
+   "u": "https://github.com/Usayaa/dailies-comparer",
+   "d": "For comparing my friends and my performance in our daily games",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "MEMORY-QUEST-ROYAL-EDITION",
+   "u": "https://github.com/Anish-21-dev/MEMORY-QUEST-ROYAL-EDITION",
+   "d": "Memory Quest: The Royal Edition. Level-based memory card game with Easy, Medium and Hard modes, voice feedback and celebration effects. Built in a vibe coding c",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "Kartu-Siji---The-Game-v.2.0",
+   "u": "https://github.com/azumarp/Kartu-Siji---The-Game-v.2.0",
+   "d": "version 2.0",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "mjq2_pvp",
+   "u": "https://github.com/Bright120788/mjq2_pvp",
+   "d": "a small vibe-coding game.",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-26"
+  },
+  {
+   "n": "chinacivmap",
+   "u": "https://github.com/wanghao2025100-oss/chinacivmap",
+   "d": "China as a grand strategy game — a Civ-style map of China built with real public data",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-27"
+  },
+  {
+   "n": "tidewind",
+   "u": "https://github.com/maximiliamid/tidewind",
+   "d": "Tidewind: a browser flight game with a MiG-23, island routes, supply drops and graded landings. Built for make.fun.",
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-27"
+  }
+ ],
+ "sources": {
+  "awesome": 3199,
+  "github_search": 988,
+  "evergamer": 1996
+ },
+ "history": [
+  {
+   "date": "2026-11-27",
+   "new": 20,
+   "newAll": 62,
+   "total": 5937
+  }
+ ]
+}
