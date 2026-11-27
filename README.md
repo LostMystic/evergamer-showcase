@@ -55,6 +55,15 @@ notes (Heart of Adventure and the Fantasy Empires remake are one build).
 By hand: run the workflow with a game's id to feature it, "force" to replace today's, or "dry" to only take the
 pictures (kept as the run's artifact for three days). Locally: `TODAY_DRY=1 python today.py`.
 
+## Radar (radar.py)
+
+Every night (`.github/workflows/radar.yml`, 03:20 UTC) the radar collects every remake, recompilation, decompilation,
+source port and AI-made game it can find (SubmitGame/awesome-decomp-games, GitHub searches, EverGamer's own list), reads
+each GitHub project's stars, size, created and last-updated dates, and commits `radar/`: `list.json` (everything),
+`seen.json` (the day each project was first found) and `summary.json` (the day's count of new ones that EverGamer's rules
+allow highlighting, the best of them, and 60 days of history). EverGamer's front page shows the count, and its "Raw list"
+page shows everything, with a search. More sources: a function in `SOURCES` that returns records.
+
 ## Secrets
 
 | Secret | What |

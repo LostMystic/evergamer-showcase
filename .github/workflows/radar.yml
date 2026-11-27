@@ -1,0 +1,40 @@
+name: Radar
+
+# Every night: every remake, recompilation, source port and AI-made game the radar can find (radar.py), what is new
+# since yesterday, committed to radar/ in this repository, where EverGamer's server reads it.
+on:
+  schedule:
+    - cron: "20 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: radar
+  cancel-in-progress: false
+
+permissions:
+  contents: write # to commit radar/
+  actions: write  # to keep this schedule switched on
+
+jobs:
+  radar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep the schedule on
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/radar.yml/enable" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Scan
+        run: python radar.py
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Commit the day
+        run: |
+          git config user.name "EverGamer radar"
+          git config user.email "radar@users.noreply.github.com"
+          git add radar
+          git diff --cached --quiet && { echo "nothing changed"; exit 0; }
+          git commit -q -m "Radar $(date -u +%F)"
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
