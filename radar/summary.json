@@ -1,111 +1,120 @@
 {
- "date": "2026-11-27",
- "total": 5937,
- "new": 20,
- "newAll": 62,
- "newAI": 14,
+ "date": "2026-11-28",
+ "total": 5918,
+ "new": 46,
+ "newAll": 117,
+ "newAI": 36,
  "newEverGamer": 0,
  "top": [
   {
-   "n": "minecraft-20kb",
-   "u": "https://github.com/eklavya-raj/minecraft-20kb",
-   "d": "Minecraft as a UEFI app in 20,760 bytes of x86-64 assembly",
-   "s": 12,
-   "t": "remake",
-   "c": "2026-11-26"
+   "n": "2 Ship 2 Harkinian (2 Ship 2 Harkinian [Android])",
+   "u": "https://github.com/linkzenic/2ship2harkinian-Ports",
+   "d": "2 Ship 2 Harkinian for Android, iPhone, iPad, and Apple TV",
+   "s": 107,
+   "t": "decompilation",
+   "c": "2026-05-23"
   },
   {
-   "n": "silmarils-maya",
-   "u": "https://github.com/Buyukcaglar/silmarils-maya",
-   "d": "Le Fétiche Maya 64bit: a native port of Silmarils' 1989 Amiga adventure by static recompilation (Windows x64; macOS in progress). Game files not included.",
-   "s": 1,
+   "n": "R4: Ridge Racer Type 4 (RidgeRacerType4Recomp)",
+   "u": "https://github.com/tetrisgm/RidgeRacerType4Modernized",
+   "d": "R4: Ridge Racer Type 4 (USA) statically recompiled with psxrecomp + recomp-ui",
+   "s": 28,
    "t": "recompilation",
-   "c": "2026-11-26"
+   "c": "2026-09-26"
   },
   {
-   "n": "whimsy-kitchen",
-   "u": "https://github.com/ionellacupcic/whimsy-kitchen",
-   "d": "a cookbook game made with AI-assisted coding for me and my housemates",
+   "n": "Azure Dreams",
+   "u": "https://github.com/PotionDweller/Azure-Dreams-HD-Recompilation",
+   "d": "Native Windows PC port of Azure Dreams (PS1) via static recompilation with psxrecomp: HD rendering, 16:9 widescreen, fast loading. Bring your own disc.",
+   "s": 7,
+   "t": "recompilation",
+   "ai": true,
+   "c": "2026-10-13"
+  },
+  {
+   "n": "Warframe-App",
+   "u": "https://github.com/Diskutabell/Warframe-App",
+   "d": "Warframe companion app for Linux and Windows: mastery and prime set tracking, relic values, syndicate standing, world timers, reward-screen prices and riven gra",
+   "s": 2,
    "t": "AI-made game",
    "ai": true,
-   "c": "2026-11-26"
+   "c": "2026-11-02"
   },
   {
-   "n": "makefun-make-the-best-cooking-game",
-   "u": "https://github.com/wicakhendrik/makefun-make-the-best-cooking-game",
-   "d": "A night-market cooking game for the desktop browser: chop, boil, sear, plate and serve across 3 stalls and 10 dishes, with VIP tickets and a lantern rush. Plain",
+   "n": "vibelight-tizen-webrtc",
+   "u": "https://github.com/samirmartins/vibelight-tizen-webrtc",
+   "d": "Very experimental WebRTC game streaming from a Windows PC running VibeShine or Sunshine to Samsung Tizen TVs. Needs the TV widget and the Windows gateway.",
+   "s": 1,
    "t": "AI-made game",
    "ai": true,
-   "c": "2026-11-26"
+   "c": "2026-11-25"
   },
   {
-   "n": "bubble-sheet-king",
-   "u": "https://github.com/ShipItFrog/bubble-sheet-king",
-   "d": "A tiny browser game: the proctor reads the answers, you fill in the bubble sheet. GitHub Game Off 2026 entry (theme: SHIFT).",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "zombie-plant-gui",
-   "u": "https://github.com/bayusetiaji/zombie-plant-gui",
-   "d": "Pixel-art GUI version of Plants vs Zombies in Rust with macroquad",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "dailies-comparer",
-   "u": "https://github.com/Usayaa/dailies-comparer",
-   "d": "For comparing my friends and my performance in our daily games",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "MEMORY-QUEST-ROYAL-EDITION",
-   "u": "https://github.com/Anish-21-dev/MEMORY-QUEST-ROYAL-EDITION",
-   "d": "Memory Quest: The Royal Edition. Level-based memory card game with Easy, Medium and Hard modes, voice feedback and celebration effects. Built in a vibe coding c",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "Kartu-Siji---The-Game-v.2.0",
-   "u": "https://github.com/azumarp/Kartu-Siji---The-Game-v.2.0",
-   "d": "version 2.0",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "mjq2_pvp",
-   "u": "https://github.com/Bright120788/mjq2_pvp",
-   "d": "a small vibe-coding game.",
-   "t": "AI-made game",
-   "ai": true,
-   "c": "2026-11-26"
-  },
-  {
-   "n": "chinacivmap",
-   "u": "https://github.com/wanghao2025100-oss/chinacivmap",
-   "d": "China as a grand strategy game — a Civ-style map of China built with real public data",
+   "n": "BeVI",
+   "u": "https://github.com/PainDe0Mie/BeVI",
+   "d": "NVIDIA: Run a good game ",
+   "s": 1,
    "t": "AI-made game",
    "ai": true,
    "c": "2026-11-27"
   },
   {
-   "n": "tidewind",
-   "u": "https://github.com/maximiliamid/tidewind",
-   "d": "Tidewind: a browser flight game with a MiG-23, island routes, supply drops and graded landings. Built for make.fun.",
+   "n": "gemini-games",
+   "u": "https://github.com/vuhung16au/gemini-games",
+   "d": "Gemini Games — Unified hub of 15 local-first 2D & 3D web games (Vite, React, TypeScript, Three.js, Canvas 2D)",
+   "s": 1,
    "t": "AI-made game",
    "ai": true,
    "c": "2026-11-27"
+  },
+  {
+   "n": "TM22_PvP_Vibecode_Game",
+   "u": "https://github.com/maidat1402-cmd/TM22_PvP_Vibecode_Game",
+   "d": "Your go-to vibe-coded game for post-work relaxation.",
+   "s": 1,
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-19"
+  },
+  {
+   "n": "puzzlery",
+   "u": "https://github.com/Fernespinoza/puzzlery",
+   "d": "Puzzlery — an accessible daily logic suite powered by Simon Tatham's engines: all 40 classic logic puzzles for Android, with a daily puzzle, playlists, stats, a",
+   "s": 1,
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-10-22"
+  },
+  {
+   "n": "Subnautica2-real-HWRT-restoration-mod",
+   "u": "https://github.com/Lightning999933/Subnautica2-real-HWRT-restoration-mod",
+   "d": "uses the base UE 5.7.4 engines shader files to restore the files that were removed from the game when the developers shipped",
+   "s": 1,
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-27"
+  },
+  {
+   "n": "sand-vac",
+   "u": "https://github.com/smyrna-pergamum/sand-vac",
+   "d": "Sand Vac: sand-picture + vacuum-cleaner puzzle game prototype (HTML5 canvas, Capacitor Android)",
+   "s": 1,
+   "t": "AI-made game",
+   "ai": true,
+   "c": "2026-11-27"
+  },
+  {
+   "n": "pop-time-run-relooped",
+   "u": "https://github.com/GMPranav/pop-time-run-relooped",
+   "d": "A native engine reimplementation port of the mobile game Prince of Persia: Time Run for PC and Android.",
+   "s": 1,
+   "t": "engine remake",
+   "c": "2026-11-03"
   }
  ],
  "sources": {
-  "awesome": 3199,
-  "github_search": 988,
+  "awesome": 3202,
+  "github_search": 970,
   "evergamer": 1996
  },
  "history": [
@@ -114,6 +123,12 @@
    "new": 20,
    "newAll": 62,
    "total": 5937
+  },
+  {
+   "date": "2026-11-28",
+   "new": 46,
+   "newAll": 117,
+   "total": 5918
   }
  ]
 }
